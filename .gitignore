@@ -8,3 +8,6 @@ coverage
 
 out/
 tsconfig.tsbuildinfo
+
+.artifact-work/
+outputs/
