@@ -63,7 +63,7 @@ with zipfile.ZipFile(sys.argv[1]) as z:
  ordered=[]
  for records in groups.values():
   best=max(records,key=lambda x:(bool(x["email"]),len(x["phone"])))
-  children=[{"last_name":s["student_last_name"],"middle_name":s["student_middle_name"],"first_name":s["student_first_name"],"class":s["sheet"],"student_id":s["student_id"] or s["ourkcs"] or (s["sheet"]+"-"+s["student_number"])} for s in records]
+  children=[{"last_name":s["student_last_name"],"middle_name":s["student_middle_name"],"first_name":s["student_first_name"],"class":s["sheet"],"student_id":s["sheet"]+"-"+s["student_number"]} for s in records]
   ordered.append({"last_name":best["guardian_last_name"],"first_name":best["guardian_first_name"],"phone":best["phone"],"email":best["email"],"children":children})
  ordered.sort(key=lambda p:(keyname(p["last_name"]),keyname(p["first_name"])))
  for i,p in enumerate(ordered,1):p["parent_ref"]="KCS-PARENT-"+str(i).zfill(4)
