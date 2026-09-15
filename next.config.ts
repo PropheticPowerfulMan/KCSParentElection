@@ -1,1 +1,1 @@
-import type {NextConfig} from "next";const c:NextConfig={reactStrictMode:true,poweredByHeader:false};export default c;
+import type {NextConfig} from "next";const onPages=process.env.GITHUB_ACTIONS==="true";const basePath=onPages?"/KCSParentElection":"";const config:NextConfig={output:"export",trailingSlash:true,images:{unoptimized:true},basePath,assetPrefix:basePath,reactStrictMode:true,poweredByHeader:false};export default config;
