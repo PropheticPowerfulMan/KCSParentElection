@@ -1,0 +1,4 @@
+export type CandidateResult={candidate_id:string;ballot_number:number;candidate:string;votes:number;vote_share_percent:number;rank:number;is_winner:boolean};
+export type PositionResult={position_id:string;position:string;valid_votes:number;abstentions:number;top_votes:number;margin_votes:number;margin_percentage_points:number;tie_for_first:boolean;concentration_index:number;effective_number_of_candidates:number;candidates:CandidateResult[]};
+export type ElectionReport={election_id:string;title:string;school_year:string;timezone:string;start_at:string;end_at:string;status:string;eligible_voters:number;ballots_cast:number;turnout_percent:number;remaining_voters:number;positions_count:number;expected_choices:number;recorded_choices:number;integrity_passed:boolean;positions:PositionResult[];report_hash?:string;certified_at?:string};
+export const positionLabel=(value:string)=>({PRESIDENT:"President",SECRETARY:"Secretary",TREASURER:"Treasurer"}[value]??value);

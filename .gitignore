@@ -11,3 +11,4 @@ tsconfig.tsbuildinfo
 
 .artifact-work/
 outputs/
+tmp/
