@@ -36,3 +36,12 @@ Deploy Next.js to Vercel, configure the five environment variables, and point th
 ## Verification checklist
 
 Run `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build`. Before election day, perform concurrency tests against a staging Supabase project, restore testing, role/RLS penetration checks, mobile/network-interruption tests, accessibility checks, and a complete mock election with signed result certification.
+
+## Themes and languages
+
+The global controls persist the KCS Nexus-inspired moon theme and the sun theme in localStorage. English and French apply across public, voter, candidacy, result, and administration routes.
+
+## Parent candidacy on GitHub Pages
+
+The candidacy page validates the parent form locally and composes an email directly to kinshasachristianschool@gmail.com. No personal information passes through an unapproved form relay. The parent must attach their photo and press Send in their email application. For automatic server-side delivery, deploy the Next.js app to Vercel with an approved transactional-email provider and server-held credentials.
+

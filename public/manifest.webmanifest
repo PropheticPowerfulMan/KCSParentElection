@@ -1,1 +1,1 @@
-{"name":"KCS Parent Election","short_name":"KCS Election","start_url":"/","display":"standalone","background_color":"#f4fafc","theme_color":"#00658e","icons":[{"src":"/kcs.jpg","sizes":"512x512","type":"image/jpeg","purpose":"any maskable"}]}
+{"name":"KCS Parent Election","short_name":"KCS Election","start_url":"/","display":"standalone","background_color":"#f4fafc","theme_color":"#00658e","icons":[{"src":"kcs.jpg","sizes":"512x512","type":"image/jpeg","purpose":"any maskable"}]}
