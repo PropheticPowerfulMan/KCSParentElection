@@ -1,0 +1,1 @@
+import {OrbitVoterLogin} from "@/components/orbit-voter-login"; export const metadata={title:"Student government election"}; export default function StudentGovernmentLogin(){return <OrbitVoterLogin audience="STUDENT"/>}
