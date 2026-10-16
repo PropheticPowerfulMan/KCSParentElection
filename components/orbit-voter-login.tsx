@@ -10,10 +10,10 @@ export function OrbitVoterLogin({audience}:{audience:Audience}){
  async function submit(event:FormEvent<HTMLFormElement>){event.preventDefault();setLoading(true);setError("");try{
   if(student){
    const base=process.env.NEXT_PUBLIC_NEXUS_API_URL||"https://kinshasachristianschool.org/nexus/api";
-   const response=await fetch(`${base}/auth/login`,{method:"POST",headers:{"content-type":"application/json","x-kcs-local-auth-only":"true"},body:JSON.stringify({identifier:identifier.trim(),password})});
+   const response=await fetch(`${base}/auth/login`,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({identifier:identifier.trim(),password})});
    const result=await response.json();const data=result?.data;if(!response.ok||!data?.token)throw new Error(result?.message||"LOGIN_FAILED");
    if(String(data.user?.role||"").toLowerCase()!=="student")throw new Error("WRONG_ELECTORATE");
-   sessionStorage.setItem("kcs-student-government-token",data.token);sessionStorage.setItem("kcs-voter-name",[data.user?.firstName,data.user?.middleName,data.user?.lastName].filter(Boolean).join(" "));location.assign("/student-government/vote/")
+   sessionStorage.setItem("kcs-student-government-token",data.token);sessionStorage.setItem("kcs-voter-name",[data.user?.firstName,data.user?.middleName,data.user?.lastName].filter(Boolean).join(" "));const next=new URLSearchParams(location.search).get("next")==="candidacy"?"/student-government/candidacy/":"/student-government/vote/";location.assign(next)
   }else{
    const base=process.env.NEXT_PUBLIC_SUPABASE_URL;const key=process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;if(!base||!key)throw new Error("SERVICE_NOT_CONFIGURED");
    const response=await fetch(`${base}/functions/v1/orbit-election-login`,{method:"POST",headers:{"content-type":"application/json",apikey:key,authorization:`Bearer ${key}`},body:JSON.stringify({identifier:identifier.trim(),password,audience})});const result=await response.json();if(!response.ok||!result.session_token)throw new Error(result.error||"LOGIN_FAILED");
