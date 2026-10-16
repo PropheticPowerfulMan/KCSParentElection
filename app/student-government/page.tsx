@@ -1,0 +1,7 @@
+import Link from "next/link";
+import {BadgeCheck,Landmark,ShieldCheck,Vote} from "lucide-react";
+import {Header} from "@/components/brand";
+
+export const metadata={title:"KCS Student Government Election",description:"Official KCS student-government election portal."};
+
+export default function StudentGovernmentHome(){return <><Header studentGovernment/><main className="sg-home"><section className="sg-hero shell"><div><p className="eyebrow">KCS ORBIT · OFFICIAL ELECTION</p><h1>Student leadership, chosen securely by students.</h1><p>Vote for the school-wide and class leaders assigned to your official Nexus profile. One verified learner, one confidential ballot.</p><div className="sg-actions"><Link className="btn btn-primary" href="/student-government/login/">Open my ballot</Link><Link className="btn btn-secondary" href="/student-government/admin/">Election management</Link></div></div><Vote/></section><section className="shell sg-principles"><article className="card"><ShieldCheck/><h2>Orbit identity</h2><p>Use your existing KCS email or access code and ecosystem password.</p></article><article className="card"><BadgeCheck/><h2>Secret ballot</h2><p>Your eligibility is verified without publishing your individual choices.</p></article><article className="card"><Landmark/><h2>Official governance</h2><p>President, Vice President and class offices are configured by authorized administration.</p></article></section></main></>}
