@@ -1,47 +1,25 @@
-# KCS Parent Election
+# KCS Orbit elections
 
-Production-oriented bilingual-ready election MVP for Kinshasa Christian School. The platform provides a branded voter journey, three-office ballot, administration, monitoring, reports, and a privacy-preserving Supabase data model.
+The parent committee and student government use the existing Nexus identity registry and the Nexus/PostgreSQL election API. No separate voter password or Supabase connection is used by the deployed application.
 
-## Architecture
+## Workspaces
+- Root: parent committee. /student-government/: student government.
+- Sign in with an existing institutional email/access code and password.
+- The Nexus SuperAdmin signs in at /admin/login/ and can grant election manager or observer permission under **Permissions**.
+- Administrators prepare a draft, dates within a published school year, offices, class/section scope, eligible people and approved candidates. Opening voting and publishing results require explicit decisions.
+- One server-confirmed participation receipt per account per election. A parent account with several children still casts one complete ballot for its applicable offices. Current institutional class/section links determine eligibility.
+- The atomic vote transaction validates every choice and the server clock. Duplicate requests return the original receipt. Immutable database triggers protect recorded ballots and choices.
+- Participation records are stored separately from ballot choices. This is not a claim of cryptographic end-to-end verifiability.
+- Live counts are hidden unless explicitly allowed. Published results preserve ties; historical closure totals are retained.
 
-Next.js App Router renders the responsive PWA. Supabase PostgreSQL is the security authority. Voter identity and anonymous ballot data live in separate tables; no voter identifier is stored on ballots or choices. The `submit_ballot` RPC locks the voter row, validates the election window and all choices, inserts the whole ballot, marks the voter as voted, and commits atomically. Concurrent submissions therefore yield exactly one accepted ballot.
+## Development and deployment
+Node 20, pnpm 9. Set NEXT_PUBLIC_NEXUS_API_URL from .env.example.
+Run pnpm install --frozen-lockfile, pnpm test, pnpm typecheck, pnpm build.
+GitHub Pages deploys out/ on the existing custom domain. The Nexus API must contain the additive 20261123210000_school_election_platform migration before this frontend is published.
+The existing PWA identity is preserved. Updates require user confirmation and do not automatically interrupt an unfinished ballot. Casting a vote requires an online server acknowledgement.
 
-## Local setup
+## Legacy data
+The supabase/ directory and unused integration sources are retained as historical migration evidence. The deployed routes do not import them. Existing Supabase data has not been deleted or imported. A verified administrative export is required to migrate private legacy voter/ballot history; no votes are recreated from guessed totals. The previous Nexus student-election tables were empty at the initial cutover audit and remain untouched.
 
-1. Install Node.js 20+ and run `npm install`.
-2. Copy `.env.example` to `.env.local` and set the Supabase values.
-3. Create a Supabase project, then run `supabase/migrations/001_initial.sql` in the SQL editor or with `supabase db push`.
-4. Run `npm run dev` and open http://localhost:3000.
-
-## Security model
-
-- RLS is enabled on all sensitive tables. Ballots and choices have no client policies.
-- Vote submission is granted only to the server service role and occurs in one locked transaction.
-- Submitted ballot rows are immutable by trigger; administrators receive no vote-edit UI.
-- PINs are bcrypt hashes and are destroyed after voting. Apply rate limits at the API/edge layer and track attempts in `login_attempts`.
-- Admin authorization is database-enforced with SUPER_ADMIN, ELECTION_ADMIN, and OBSERVER roles.
-- Receipts contain only an anonymous confirmation code and time.
-- Interim results default to off. Ties must be displayed as requiring an official decision.
-
-Never expose `SUPABASE_SERVICE_ROLE_KEY` to the browser. Production authentication and import endpoints should be deployed as server routes or Supabase Edge Functions. CSV/XLSX rows must be previewed, validated, and deduplicated by voter code and student ID before insertion.
-
-## Election operation
-
-Create an election, its three positions, candidates, voters, and admin roles. Keep status DRAFT while editing. Schedule or explicitly switch to OPEN only inside the configured window. Closing sets CLOSED; verify totals, then publish results. Never correct individual ballot rowscancel and rerun under school policy if integrity is disputed.
-
-## Deployment
-
-Deploy Next.js to Vercel, configure the five environment variables, and point the custom domain to Vercel. Configure Supabase allowed URLs, backups, PITR, MFA for admins, CAPTCHA/rate limits, storage policies, and log retention.
-
-## Verification checklist
-
-Run `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build`. Before election day, perform concurrency tests against a staging Supabase project, restore testing, role/RLS penetration checks, mobile/network-interruption tests, accessibility checks, and a complete mock election with signed result certification.
-
-## Themes and languages
-
-The global controls persist the KCS Nexus-inspired moon theme and the sun theme in localStorage. English and French apply across public, voter, candidacy, result, and administration routes.
-
-## Parent candidacy on GitHub Pages
-
-The candidacy page validates the parent form locally and composes an email directly to kinshasachristianschool@gmail.com. No personal information passes through an unapproved form relay. The parent must attach their photo and press Send in their email application. For automatic server-side delivery, deploy the Next.js app to Vercel with an approved transactional-email provider and server-held credentials.
-
+## Validation
+Run integration voting tests only on isolated clones with synthetic accounts and no live message providers. Verify wrong-role access, class/section boundaries, concurrent duplicates, closed windows, immutable ballots, draft-only edits and equality of participation/ballot totals. Never cast production test votes.
