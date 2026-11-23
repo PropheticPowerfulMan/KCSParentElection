@@ -1,1 +1,2 @@
-import {OrbitVoterLogin} from "@/components/orbit-voter-login"; export default function Login(){return <OrbitVoterLogin audience="PARENT"/>}
+import {OrbitVoterLogin} from "@/components/orbit-voter-login";
+export default function Page(){return <OrbitVoterLogin audience="PARENT"/>}
