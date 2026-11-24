@@ -1,2 +1,1 @@
-import {ElectionAdmin} from "@/components/election-admin";
-export default function Page(){return <ElectionAdmin audience="PARENT" section="reports"/>}
+export default function Page(){return null}
