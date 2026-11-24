@@ -5,12 +5,12 @@ import {ArrowLeft,ArrowRight,Check,CheckCircle2,ClipboardCheck,FilePenLine,Loade
 import {Header} from './brand';
 import {ElectionDialog} from './election-dialog';
 import {useElectionLanguage} from './election-language';
-import {clearElectionToken,electionImageUrl,electionError,electionPath,electionRequest,getElectionToken,type Electorate} from '@/lib/orbit-api';
+import {clearElectionSessions,electionImageUrl,electionError,electionPath,electionRequest,getElectionToken,type Electorate} from '@/lib/orbit-api';
 type Props={audience:Electorate;mode?:'vote'|'candidacy'};
 const ABSTAIN='__ABSTAIN__';
 export function ElectionVoter({audience,mode='vote'}:Props){
  const {fr,tr}=useElectionLanguage(),base=electionPath(audience),[data,setData]=useState<any>(null),[busy,setBusy]=useState(false),[loading,setLoading]=useState(true),[error,setError]=useState(''),[step,setStep]=useState(0),[choices,setChoices]=useState<Record<string,string>>({}),[confirm,setConfirm]=useState(false),[notice,setNotice]=useState(''),[officeId,setOfficeId]=useState(''),[biography,setBiography]=useState(''),[photo,setPhoto]=useState(''),[consent,setConsent]=useState(false),requestId=useRef(''),[photoFile,setPhotoFile]=useState<File|null>(null),[pendingApplication,setPendingApplication]=useState('');
- const logout=()=>{clearElectionToken(audience);location.assign(base+'/login/')};
+ const logout=()=>{clearElectionSessions();location.replace(base+'/login/')};
  async function load(){setLoading(true);setError('');try{if(!getElectionToken(audience)){location.assign(base+'/login/'+(mode==='candidacy'?'?next=candidacy':''));return}const d=await electionRequest('/elections/'+audience+'/session',{session:audience});setData(d);if(!officeId)setOfficeId(d.offices[0]?.id||'')}catch(e){setError(electionError(e,fr))}finally{setLoading(false)}}
  useEffect(()=>{void load()},[audience]);
  const offices=data?.offices||[],review=step>=offices.length,office=offices[step],complete=useMemo(()=>offices.length>0&&offices.every((o:any)=>Boolean(choices[o.id])),[offices,choices]);

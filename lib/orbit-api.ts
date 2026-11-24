@@ -3,8 +3,17 @@ export type ElectionSession='PARENT'|'STUDENT'|'ADMIN'
 export const NEXUS_API=(process.env.NEXT_PUBLIC_NEXUS_API_URL||'https://api-nexus.kinshasachristianschool.org/api').replace(/\/+$/,'')
 const key=(kind:ElectionSession)=>'kcs-election:orbit:'+kind
 export const getElectionToken=(kind:ElectionSession)=>typeof window==='undefined'?'':sessionStorage.getItem(key(kind))||''
-export function saveElectionToken(kind:ElectionSession,token:string){sessionStorage.setItem(key(kind),token)}
+export function saveElectionToken(kind:ElectionSession,token:string){
+ const subject=(value:string)=>{try{return JSON.parse(atob(value.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).sub}catch{return null}}
+ const next=subject(token);if(!next)throw new Error('ELECTION_INVALID_SESSION')
+ for(const other of ['PARENT','STUDENT','ADMIN'] as const){const old=getElectionToken(other);if(old&&subject(old)!==next)clearElectionToken(other)}
+ sessionStorage.setItem(key(kind),token);window.dispatchEvent(new Event('kcs-election-auth-changed'))
+}
 export function clearElectionToken(kind:ElectionSession){sessionStorage.removeItem(key(kind));sessionStorage.removeItem(key(kind)+':name')}
+export function clearElectionSessions(){
+ for(const kind of ['PARENT','STUDENT','ADMIN'] as const){clearElectionToken(kind);sessionStorage.removeItem('kcs-election:nexus-return:'+kind);sessionStorage.removeItem('kcs-election:selected-election:'+kind)}
+ window.dispatchEvent(new Event('kcs-election-auth-changed'))
+}
 export class ElectionApiError extends Error{constructor(public code:string,public status:number){super(code)}}
 export async function electionRequest(path:string,options:{method?:string;body?:unknown;session?:ElectionSession;token?:string;signal?:AbortSignal}={}){
  const token=options.token||options.session&&getElectionToken(options.session),form=typeof FormData!=='undefined'&&options.body instanceof FormData
@@ -17,6 +26,11 @@ export function electionPath(kind:Electorate){return kind==='STUDENT'?'/student-
 export function electionError(error:unknown,fr:boolean){
  const code=error instanceof Error?error.message:''
  const messages:Array<[string,string,string]>=[
+ ['LAUNCH_EXPIRED','Ce lien de connexion a expiré ou a déjà été utilisé. Rouvrez l’espace électoral depuis Nexus AI.','This sign-in link expired or was already used. Reopen elections from Nexus AI.'],
+ ['OFFICE_CHANGED','Ce poste a changé. Actualisez avant de confirmer.','This office changed. Refresh before confirming.'],
+ ['OFFICE_HAS_CANDIDACIES','Ce poste contient des candidatures et ne peut pas être supprimé.','This office has applications and cannot be deleted.'],
+ ['OFFICES_FROZEN','Les postes sont protégés après l’ouverture du scrutin.','Offices are protected after voting opens.'],
+ ['INVALID_EXTENSION','Choisissez une échéance ultérieure, dans l’année scolaire publiée, et précisez le motif.','Choose a later deadline within the published school year and provide the reason.'],
  ['INVALID_PHOTO','Choisissez une photo JPEG, PNG ou WebP valide.','Choose a valid JPEG, PNG or WebP photo.'],
  ['PHOTO_LIMIT','La photo ne peut pas dépasser 5 Mo.','The photo must not exceed 5 MB.'],
  ['WRONG_ELECTORATE','Ce compte institutionnel n’appartient pas à cet électorat.','This institutional account does not belong to this electorate.'],
