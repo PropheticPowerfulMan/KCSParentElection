@@ -1,0 +1,1 @@
+export function electionPwa(pathname:string){const student=/^\/student-government(?:\/|$)/.test(pathname);return{student,key:student?'kcs-student-election':'kcs-parent-election',manifest:student?'/student-government/manifest.webmanifest':'/manifest.webmanifest',script:student?'/student-government/sw.js':'/sw.js',scope:student?'/student-government/':'/'}}
