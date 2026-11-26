@@ -1,16 +1,19 @@
 "use client";
+import{usePathname}from'next/navigation';
+import{electionPwa}from'@/lib/election-pwa';
 import {useEffect,useRef,useState} from 'react';
 import {ArrowUpCircle,Globe,Loader2,Moon,Sun} from 'lucide-react';
 import {useElectionLanguage,useElectionTheme,setElectionLanguage} from './election-language';
 import {ElectionDialog} from './election-dialog';
 export function ElectionControls(){const {fr,tr}=useElectionLanguage(),{theme,toggle}=useElectionTheme();return <div className="ev-controls"><div aria-label={tr('Langue','Language')}><Globe size={14}/><button type="button" aria-pressed={fr} onClick={()=>setElectionLanguage('fr')}>FR</button><button type="button" aria-pressed={!fr} onClick={()=>setElectionLanguage('en')}>EN</button></div><button type="button" className="ev-theme" onClick={toggle} aria-label={theme==='dark'?tr('Mode soleil','Light mode'):tr('Mode lune','Dark mode')}>{theme==='dark'?<Sun size={17}/>:<Moon size={17}/>}</button></div>}
 export function ClientSettings(){
+ const pathname=usePathname(),platform=electionPwa(pathname);
  const {lang,tr}=useElectionLanguage(),[waiting,setWaiting]=useState<ServiceWorker|null>(null),[confirm,setConfirm]=useState(false),[reloading,setReloading]=useState(false),requested=useRef(false);
  useEffect(()=>{document.documentElement.lang=lang},[lang]);
  useEffect(()=>{if(!('serviceWorker'in navigator))return;let active=true;const base=process.env.GITHUB_ACTIONS==='true'&&process.env.KCS_CUSTOM_DOMAIN!=='true'?'/KCSParentElection':'';
  const changed=()=>{if(requested.current)location.reload()};navigator.serviceWorker.addEventListener('controllerchange',changed);
- navigator.serviceWorker.register(base+'/sw.js',{scope:base+'/'}).then(reg=>{if(!active)return;if(reg.waiting&&navigator.serviceWorker.controller)setWaiting(reg.waiting);reg.addEventListener('updatefound',()=>{const worker=reg.installing;worker?.addEventListener('statechange',()=>{if(worker.state==='installed'&&navigator.serviceWorker.controller&&active)setWaiting(worker)})});void reg.update().catch(()=>undefined)}).catch(()=>undefined);
- return()=>{active=false;navigator.serviceWorker.removeEventListener('controllerchange',changed)}},[]);
+ navigator.serviceWorker.register(base+platform.script,{scope:base+platform.scope,updateViaCache:'none'}).then(reg=>{if(!active)return;if(reg.waiting&&navigator.serviceWorker.controller)setWaiting(reg.waiting);reg.addEventListener('updatefound',()=>{const worker=reg.installing;worker?.addEventListener('statechange',()=>{if(worker.state==='installed'&&navigator.serviceWorker.controller&&active)setWaiting(worker)})});void reg.update().catch(()=>undefined)}).catch(()=>undefined);
+ return()=>{active=false;navigator.serviceWorker.removeEventListener('controllerchange',changed)}},[platform.key]);
  // A deferred update remains pending and must be offered again.
  useEffect(()=>{if(waiting)setConfirm(true)},[waiting]);
  useEffect(()=>{
