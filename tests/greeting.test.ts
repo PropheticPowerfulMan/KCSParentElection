@@ -1,0 +1,2 @@
+import{describe,it,expect}from'vitest';import{electionGreeting}from'../lib/election-greeting';
+describe('Kinshasa institutional greetings',()=>{it.each([['2026-11-26T07:00:00Z','Good morning'],['2026-11-26T12:00:00Z','Good afternoon'],['2026-11-26T18:00:00Z','Good evening']])('uses Kinshasa time for %s',(time,text)=>expect(electionGreeting('Visual Teacher','en',new Date(time))).toBe(text+', Visual Teacher'));it('keeps French accents and the verified name',()=>expect(electionGreeting('Lévana','fr',new Date('2026-11-26T12:00:00Z'))).toBe('Bon après-midi, Lévana'))});

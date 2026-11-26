@@ -4,20 +4,20 @@ import {ArrowRight,Eye,EyeOff,KeyRound,Loader2,LockKeyhole,ShieldCheck,Vote} fro
 import {Header} from './brand';
 import Link from 'next/link';
 import {clearElectionSessions} from '@/lib/orbit-api';
-import {electionHome,electionNext} from '@/lib/election-navigation';
-import {useElectionLanguage} from './election-language';
+import {electionHome,electionNext,saveNexusReturn} from '@/lib/election-navigation';
+import {setElectionLanguage,useElectionLanguage} from './election-language';
 import {electionError,electionPath,electionRequest,saveElectionToken,type ElectionSession} from '@/lib/orbit-api';
 export function OrbitVoterLogin({audience,returnTo}:{audience:ElectionSession;returnTo?:string}){
  const {fr,tr}=useElectionLanguage(),student=audience==='STUDENT'||Boolean(returnTo?.startsWith('/student-government')),admin=audience==='ADMIN';
  const [identifier,setIdentifier]=useState(''),[password,setPassword]=useState(''),[code,setCode]=useState(''),[show,setShow]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState(''),[needsCode,setNeedsCode]=useState(false);
  const settle=(event:{target:HTMLInputElement})=>{const input=event.target;input.scrollLeft=0;requestAnimationFrame(()=>{if(document.activeElement!==input)input.scrollLeft=0})};
- useEffect(()=>{clearElectionSessions()},[]);
+ useEffect(()=>{clearElectionSessions();const query=new URLSearchParams(location.search);const destination=query.get('nexusReturn');if(destination)saveNexusReturn(audience,destination);const lang=query.get('lang');if(lang==='fr'||lang==='en')setElectionLanguage(lang);const theme=query.get('theme');if(theme==='light'||theme==='dark'){localStorage.setItem('kcs-theme',theme);document.documentElement.dataset.theme=theme}},[audience]);
  useEffect(()=>{const input=document.getElementById('election-password') as HTMLInputElement|null;if(input&&document.activeElement!==input)input.scrollLeft=0},[show]);
  async function submit(event:FormEvent){event.preventDefault();if(busy)return;setBusy(true);setError('');try{
   const result=await electionRequest('/auth/login',{method:'POST',body:{identifier:identifier.trim(),password,...(code?{twoFactorCode:code}:{})}});
   if(!result?.token)throw Error('ELECTION_SERVICE_UNAVAILABLE');
   await electionRequest(admin?'/elections/admin/access':'/elections/'+audience+'/session',{token:result.token});
-  saveElectionToken(audience,result.token);setPassword('');const base=student?'/student-government':'';
+  saveElectionToken(audience,result.token);const person=result.user||result;const name=[person.lastName,person.middleName,person.firstName].filter(Boolean).join(' ')||person.displayName||'';sessionStorage.setItem('kcs-election:orbit:'+audience+':name',name);setPassword('');const base=student?'/student-government':'';
   const target=admin?(returnTo==='/student-government/admin/'?returnTo:electionNext('ADMIN',new URLSearchParams(location.search).get('next'))):electionNext(audience,new URLSearchParams(location.search).get('next'));
   location.replace(target);
  }catch(e){const text=e instanceof Error?e.message:'';if(/factor|2fa|verification/i.test(text))setNeedsCode(true);setError(electionError(e,fr));setBusy(false)}}

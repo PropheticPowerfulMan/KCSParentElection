@@ -22,7 +22,7 @@ export function ElectionAccessGate({children}:{children:ReactNode}){
    const candidates:ElectionSession[]=kind==='ADMIN'||privateVoter?[kind]:[kind,'ADMIN'];
    for(const audience of candidates){
     if(!getElectionToken(audience))continue;
-    try{const result=await electionRequest(audience==='ADMIN'?'/elections/admin/access':'/elections/'+audience+'/session',{session:audience});if(sequence.current!==serial)return;delete document.documentElement.dataset.electionLocked;setState({path,status:'ready',token:getElectionToken(audience),access:{audience,readOnly:audience==='ADMIN'&&!result.canManage,name:result.voter?.name||''}});return}
+    try{const result=await electionRequest(audience==='ADMIN'?'/elections/admin/access':'/elections/'+audience+'/session',{session:audience});if(sequence.current!==serial)return;delete document.documentElement.dataset.electionLocked;setState({path,status:'ready',token:getElectionToken(audience),access:{audience,readOnly:audience==='ADMIN'&&!result.canManage,name:result.voter?.name||sessionStorage.getItem('kcs-election:orbit:'+audience+':name')||''}});return}
     catch(e){if(sequence.current!==serial)return;if(e instanceof ElectionApiError&&[401,403].includes(e.status))continue;if(!retained)setState({path,status:'unavailable',access:empty});return}
    }
    if(sequence.current===serial)redirect();

@@ -1,4 +1,4 @@
-const CACHE="kcs-student-election-shell-20261126-distinct-pwa";
+const CACHE="kcs-student-election-shell-20261126-login-welcome";
 const CORE=["/student-government/","/student-government/manifest.webmanifest","/kcs.jpg","/kcs-election-192.png","/kcs-election-512.png"];
 self.addEventListener("install",event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE))));
 self.addEventListener("message",event=>{if(event.data?.type==="SKIP_WAITING")self.skipWaiting()});
