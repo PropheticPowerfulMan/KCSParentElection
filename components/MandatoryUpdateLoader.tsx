@@ -1,0 +1,3 @@
+"use client";
+import{useEffect}from'react';
+export default function MandatoryUpdateLoader(){useEffect(()=>{const scope=location.pathname.startsWith('/student-government/')?'/student-government/':'/',app=scope==='/student-government/'?'KCS_STUDENT_ELECTION':'KCS_PARENT_ELECTION';const script=document.createElement('script');script.defer=true;script.src=scope+'kcs-update.js?v='+process.env.NEXT_PUBLIC_KCS_CLIENT_VERSION;script.dataset.kcsUpdateApp=app;script.dataset.kcsUpdateScope=scope;script.dataset.kcsUpdateVersion=process.env.NEXT_PUBLIC_KCS_CLIENT_VERSION;document.body.append(script);return()=>script.remove()},[]);return null}

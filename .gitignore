@@ -13,3 +13,9 @@ tsconfig.tsbuildinfo
 outputs/
 tmp/
 output/responsive-audit/
+
+# Generated scoped update assets (built from client-runtime).
+/public/app-version.json
+/public/kcs-update.js
+/public/student-government/app-version.json
+/public/student-government/kcs-update.js
