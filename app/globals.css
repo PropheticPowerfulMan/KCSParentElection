@@ -1,2 +1,4 @@
 @import "tailwindcss";
 @import "./election-workspace.css";
+
+.ev-personal-portrait{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;flex-shrink:0;border:1px solid var(--line,#55748c);border-radius:13px;overflow:hidden;background:var(--surface,#244259);color:var(--ink,#e6eff8);font-size:13px;font-weight:800}.ev-personal-portrait img{width:100%;height:100%;object-fit:cover}
